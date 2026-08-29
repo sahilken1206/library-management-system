@@ -1,3 +1,4 @@
+```php
 <?php
 
 include "db.php";
@@ -17,9 +18,13 @@ $result = mysqli_query($conn, $sql);
 ?>
 
 <!DOCTYPE html>
+
 <html>
+
 <head>
+
     <title>Library Loans</title>
+
 </head>
 
 <body>
@@ -29,11 +34,14 @@ $result = mysqli_query($conn, $sql);
 <table border="1" cellpadding="10">
 
     <tr>
+
         <th>Loan ID</th>
         <th>Book</th>
         <th>Member</th>
         <th>Loan Date</th>
         <th>Return Date</th>
+        <th>Action</th>
+
     </tr>
 
 <?php
@@ -43,15 +51,55 @@ while ($loan = mysqli_fetch_assoc($result)) {
 ?>
 
     <tr>
+
         <td><?php echo $loan["id"]; ?></td>
+
         <td><?php echo $loan["title"]; ?></td>
+
         <td><?php echo $loan["name"]; ?></td>
+
         <td><?php echo $loan["loan_date"]; ?></td>
+
         <td>
-            <?php 
+
+            <?php
+
             echo $loan["return_date"] ?? "Not returned";
+
             ?>
+
         </td>
+
+        <td>
+
+            <?php
+
+            if ($loan["return_date"] == NULL) {
+
+            ?>
+
+                <a href="return_loan.php?id=<?php echo $loan["id"]; ?>">
+                    Return
+                </a>
+
+            <?php
+
+            } else {
+
+                echo "Returned";
+
+            }
+
+            ?>
+
+            |
+
+            <a href="delete_loan.php?id=<?php echo $loan["id"]; ?>">
+                Delete
+            </a>
+
+        </td>
+
     </tr>
 
 <?php
@@ -63,4 +111,6 @@ while ($loan = mysqli_fetch_assoc($result)) {
 </table>
 
 </body>
-</html> 
+
+</html>
+```

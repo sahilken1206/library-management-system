@@ -9,9 +9,18 @@ if (!isset($_GET["id"])) {
 
 $id = $_GET["id"];
 
-$sql = "DELETE FROM members WHERE id = $id";
+$stmt = mysqli_prepare(
+    $conn,
+    "DELETE FROM members WHERE id = ?"
+);
 
-if (mysqli_query($conn, $sql)) {
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
+
+if (mysqli_stmt_execute($stmt)) {
 
     echo "Member deleted successfully!";
 
@@ -20,9 +29,11 @@ if (mysqli_query($conn, $sql)) {
 
 } else {
 
-    echo "Error: " . mysqli_error($conn);
+    echo "Error: " . mysqli_stmt_error($stmt);
 
 }
+
+mysqli_stmt_close($stmt);
 
 ?>
 ```

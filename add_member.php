@@ -1,3 +1,4 @@
+```php
 <?php
 
 include "db.php";
@@ -14,14 +15,27 @@ if (isset($_POST["submit"])) {
 
     } else {
 
-        $sql = "INSERT INTO members (name, email, phone)
-                VALUES ('$name', '$email', '$phone')";
+        $stmt = mysqli_prepare(
+            $conn,
+            "INSERT INTO members (name, email, phone)
+             VALUES (?, ?, ?)"
+        );
 
-        if (mysqli_query($conn, $sql)) {
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sss",
+            $name,
+            $email,
+            $phone
+        );
+
+        if (mysqli_stmt_execute($stmt)) {
             echo "Member added successfully!";
         } else {
-            echo "Error: " . mysqli_error($conn);
+            echo "Error: " . mysqli_stmt_error($stmt);
         }
+
+        mysqli_stmt_close($stmt);
     }
 }
 
@@ -29,6 +43,7 @@ if (isset($_POST["submit"])) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Add Member</title>
 </head>
@@ -56,4 +71,6 @@ if (isset($_POST["submit"])) {
 </form>
 
 </body>
-</html> 
+
+</html>
+```

@@ -9,9 +9,24 @@ if (!isset($_GET["id"])) {
 
 $id = $_GET["id"];
 
-$result = mysqli_query($conn, "SELECT * FROM members WHERE id = $id");
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT * FROM members WHERE id = ?"
+);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
+
+mysqli_stmt_execute($stmt);
+
+$result = mysqli_stmt_get_result($stmt);
 
 $member = mysqli_fetch_assoc($result);
+
+mysqli_stmt_close($stmt);
 
 if (!$member) {
     die("Member not found.");
@@ -29,23 +44,36 @@ if (isset($_POST["submit"])) {
 
     } else {
 
-        $sql = "UPDATE members
-                SET name = '$name',
-                    email = '$email',
-                    phone = '$phone'
-                WHERE id = $id";
+        $stmt = mysqli_prepare(
+            $conn,
+            "UPDATE members
+             SET name = ?,
+                 email = ?,
+                 phone = ?
+             WHERE id = ?"
+        );
 
-        if (mysqli_query($conn, $sql)) {
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssi",
+            $name,
+            $email,
+            $phone,
+            $id
+        );
 
-            echo "Member updated successfully!";
+        if (mysqli_stmt_execute($stmt)) {
+
+            mysqli_stmt_close($stmt);
 
             header("Location: members.php");
             exit();
 
         } else {
 
-            echo "Error: " . mysqli_error($conn);
+            echo "Error: " . mysqli_stmt_error($stmt);
 
+            mysqli_stmt_close($stmt);
         }
     }
 }

@@ -1,3 +1,4 @@
+```php
 <?php
 
 include "db.php";
@@ -14,14 +15,27 @@ if (isset($_POST["submit"])) {
 
     } else {
 
-        $sql = "INSERT INTO loans (book_id, member_id, loan_date)
-                VALUES ('$book_id', '$member_id', '$loan_date')";
+        $stmt = mysqli_prepare(
+            $conn,
+            "INSERT INTO loans (book_id, member_id, loan_date)
+             VALUES (?, ?, ?)"
+        );
 
-        if (mysqli_query($conn, $sql)) {
+        mysqli_stmt_bind_param(
+            $stmt,
+            "iis",
+            $book_id,
+            $member_id,
+            $loan_date
+        );
+
+        if (mysqli_stmt_execute($stmt)) {
             echo "Loan created successfully!";
         } else {
-            echo "Error: " . mysqli_error($conn);
+            echo "Error: " . mysqli_stmt_error($stmt);
         }
+
+        mysqli_stmt_close($stmt);
     }
 }
 
@@ -29,6 +43,7 @@ if (isset($_POST["submit"])) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Create Loan</title>
 </head>
@@ -56,4 +71,6 @@ if (isset($_POST["submit"])) {
 </form>
 
 </body>
-</html> 
+
+</html>
+```

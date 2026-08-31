@@ -1,3 +1,4 @@
+```php
 <?php
 
 include "db.php";
@@ -15,14 +16,28 @@ if (isset($_POST["submit"])) {
 
     } else {
 
-        $sql = "INSERT INTO books (title, author, category, quantity)
-                VALUES ('$title', '$author', '$category', '$quantity')";
+        $stmt = mysqli_prepare(
+            $conn,
+            "INSERT INTO books (title, author, category, quantity)
+             VALUES (?, ?, ?, ?)"
+        );
 
-        if (mysqli_query($conn, $sql)) {
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssi",
+            $title,
+            $author,
+            $category,
+            $quantity
+        );
+
+        if (mysqli_stmt_execute($stmt)) {
             echo "Book added successfully!";
         } else {
-            echo "Error: " . mysqli_error($conn);
+            echo "Error: " . mysqli_stmt_error($stmt);
         }
+
+        mysqli_stmt_close($stmt);
     }
 }
 
@@ -30,6 +45,7 @@ if (isset($_POST["submit"])) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Add Book</title>
 </head>
@@ -61,4 +77,6 @@ if (isset($_POST["submit"])) {
 </form>
 
 </body>
+
 </html>
+```

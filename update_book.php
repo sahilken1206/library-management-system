@@ -1,3 +1,4 @@
+```php
 <?php
 
 include "db.php";
@@ -7,23 +8,40 @@ if (isset($_POST["update"])) {
     $id = $_POST["id"];
     $quantity = $_POST["quantity"];
 
-    $sql = "UPDATE books SET quantity = '$quantity' WHERE id = '$id'";
+    $stmt = mysqli_prepare(
+        $conn,
+        "UPDATE books SET quantity = ? WHERE id = ?"
+    );
 
-    if (mysqli_query($conn, $sql)) {
+    mysqli_stmt_bind_param(
+        $stmt,
+        "ii",
+        $quantity,
+        $id
+    );
+
+    if (mysqli_stmt_execute($stmt)) {
         echo "Book updated successfully!";
     } else {
-        echo "Error: " . mysqli_error($conn);
+        echo "Error: " . mysqli_stmt_error($stmt);
     }
+
+    mysqli_stmt_close($stmt);
 }
 
 ?>
 
 <form method="POST">
 
-    Book ID: <input type="number" name="id"><br><br>
+    Book ID:
+    <input type="number" name="id">
+    <br><br>
 
-    New Quantity: <input type="number" name="quantity"><br><br>
+    New Quantity:
+    <input type="number" name="quantity">
+    <br><br>
 
     <button type="submit" name="update">Update Book</button>
 
 </form>
+```

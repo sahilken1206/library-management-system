@@ -9,18 +9,31 @@ if (!isset($_GET["id"])) {
 
 $id = $_GET["id"];
 
-$sql = "UPDATE loans
-        SET return_date = CURDATE()
-        WHERE id = $id";
+$stmt = mysqli_prepare(
+    $conn,
+    "UPDATE loans
+     SET return_date = CURDATE()
+     WHERE id = ?"
+);
 
-if (mysqli_query($conn, $sql)) {
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
+
+if (mysqli_stmt_execute($stmt)) {
+
+    mysqli_stmt_close($stmt);
 
     header("Location: loans.php");
     exit();
 
 } else {
 
-    echo "Error: " . mysqli_error($conn);
+    echo "Error: " . mysqli_stmt_error($stmt);
+
+    mysqli_stmt_close($stmt);
 
 }
 

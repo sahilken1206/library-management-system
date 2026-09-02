@@ -22,7 +22,7 @@ mysqli_stmt_bind_param(
 
 if (mysqli_stmt_execute($stmt)) {
 
-    echo "Member deleted successfully!";
+    mysqli_stmt_close($stmt);
 
     header("Location: members.php");
     exit();
@@ -31,9 +31,8 @@ if (mysqli_stmt_execute($stmt)) {
 
     echo "Error: " . mysqli_stmt_error($stmt);
 
+    mysqli_stmt_close($stmt);
 }
-
-mysqli_stmt_close($stmt);
 
 ?>
 ```

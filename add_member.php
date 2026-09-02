@@ -13,6 +13,14 @@ if (isset($_POST["submit"])) {
 
         echo "Please fill in all fields.";
 
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+        echo "Please enter a valid email address.";
+
+    } elseif (!preg_match("/^[0-9]{10}$/", $phone)) {
+
+        echo "Phone number must contain exactly 10 digits.";
+
     } else {
 
         $stmt = mysqli_prepare(
@@ -30,8 +38,11 @@ if (isset($_POST["submit"])) {
         );
 
         if (mysqli_stmt_execute($stmt)) {
+
             echo "Member added successfully!";
+
         } else {
+
             echo "Error: " . mysqli_stmt_error($stmt);
         }
 
@@ -45,7 +56,9 @@ if (isset($_POST["submit"])) {
 <html>
 
 <head>
+
     <title>Add Member</title>
+
 </head>
 
 <body>
@@ -66,7 +79,9 @@ if (isset($_POST["submit"])) {
     <input type="text" name="phone">
     <br><br>
 
-    <button type="submit" name="submit">Add Member</button>
+    <button type="submit" name="submit">
+        Add Member
+    </button>
 
 </form>
 

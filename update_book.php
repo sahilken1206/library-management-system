@@ -3,45 +3,159 @@
 
 include "db.php";
 
+if (!isset($_GET["id"])) {
+    die("Book ID not found.");
+}
+
+$id = $_GET["id"];
+
+/* Get book details */
+
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT * FROM books WHERE id = ?"
+);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
+
+mysqli_stmt_execute($stmt);
+
+$result = mysqli_stmt_get_result($stmt);
+
+$book = mysqli_fetch_assoc($result);
+
+mysqli_stmt_close($stmt);
+
+if (!$book) {
+    die("Book not found.");
+}
+
+
+/* Update book */
+
 if (isset($_POST["update"])) {
 
-    $id = $_POST["id"];
+    $title = $_POST["title"];
+    $author = $_POST["author"];
+    $category = $_POST["category"];
     $quantity = $_POST["quantity"];
 
-    $stmt = mysqli_prepare(
-        $conn,
-        "UPDATE books SET quantity = ? WHERE id = ?"
-    );
+    if (
+        empty($title) ||
+        empty($author) ||
+        empty($category) ||
+        $quantity === ""
+    ) {
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "ii",
-        $quantity,
-        $id
-    );
+        echo "Please fill in all fields.";
 
-    if (mysqli_stmt_execute($stmt)) {
-        echo "Book updated successfully!";
+    } elseif (!is_numeric($quantity) || $quantity < 0) {
+
+        echo "Quantity must be 0 or greater.";
+
     } else {
-        echo "Error: " . mysqli_stmt_error($stmt);
-    }
 
-    mysqli_stmt_close($stmt);
+        $stmt = mysqli_prepare(
+            $conn,
+            "UPDATE books
+             SET title = ?,
+                 author = ?,
+                 category = ?,
+                 quantity = ?
+             WHERE id = ?"
+        );
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssii",
+            $title,
+            $author,
+            $category,
+            $quantity,
+            $id
+        );
+
+        if (mysqli_stmt_execute($stmt)) {
+
+            mysqli_stmt_close($stmt);
+
+            header("Location: book.php");
+            exit();
+
+        } else {
+
+            echo "Error: " . mysqli_stmt_error($stmt);
+
+            mysqli_stmt_close($stmt);
+        }
+    }
 }
 
 ?>
 
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Update Book</title>
+
+</head>
+
+<body>
+
+<h2>Update Book</h2>
+
 <form method="POST">
 
-    Book ID:
-    <input type="number" name="id">
+    Title:
+    <input
+        type="text"
+        name="title"
+        value="<?php echo htmlspecialchars($book["title"]); ?>"
+    >
+
     <br><br>
 
-    New Quantity:
-    <input type="number" name="quantity">
+    Author:
+    <input
+        type="text"
+        name="author"
+        value="<?php echo htmlspecialchars($book["author"]); ?>"
+    >
+
     <br><br>
 
-    <button type="submit" name="update">Update Book</button>
+    Category:
+    <input
+        type="text"
+        name="category"
+        value="<?php echo htmlspecialchars($book["category"]); ?>"
+    >
+
+    <br><br>
+
+    Quantity:
+    <input
+        type="number"
+        name="quantity"
+        min="0"
+        value="<?php echo htmlspecialchars($book["quantity"]); ?>"
+    >
+
+    <br><br>
+
+    <button type="submit" name="update">
+        Update Book
+    </button>
 
 </form>
+
+</body>
+
+</html>
 ```

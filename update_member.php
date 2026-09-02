@@ -9,6 +9,8 @@ if (!isset($_GET["id"])) {
 
 $id = $_GET["id"];
 
+/* Get member details */
+
 $stmt = mysqli_prepare(
     $conn,
     "SELECT * FROM members WHERE id = ?"
@@ -32,6 +34,9 @@ if (!$member) {
     die("Member not found.");
 }
 
+
+/* Update member */
+
 if (isset($_POST["submit"])) {
 
     $name = $_POST["name"];
@@ -41,6 +46,14 @@ if (isset($_POST["submit"])) {
     if (empty($name) || empty($email) || empty($phone)) {
 
         echo "Please fill in all fields.";
+
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+        echo "Please enter a valid email address.";
+
+    } elseif (!preg_match("/^[0-9]{10}$/", $phone)) {
+
+        echo "Phone number must contain exactly 10 digits.";
 
     } else {
 
@@ -84,7 +97,9 @@ if (isset($_POST["submit"])) {
 <html>
 
 <head>
+
     <title>Update Member</title>
+
 </head>
 
 <body>
@@ -94,18 +109,30 @@ if (isset($_POST["submit"])) {
 <form method="POST">
 
     Name:
-    <input type="text" name="name"
-           value="<?php echo $member["name"]; ?>">
+    <input
+        type="text"
+        name="name"
+        value="<?php echo htmlspecialchars($member["name"]); ?>"
+    >
+
     <br><br>
 
     Email:
-    <input type="email" name="email"
-           value="<?php echo $member["email"]; ?>">
+    <input
+        type="email"
+        name="email"
+        value="<?php echo htmlspecialchars($member["email"]); ?>"
+    >
+
     <br><br>
 
     Phone:
-    <input type="text" name="phone"
-           value="<?php echo $member["phone"]; ?>">
+    <input
+        type="text"
+        name="phone"
+        value="<?php echo htmlspecialchars($member["phone"]); ?>"
+    >
+
     <br><br>
 
     <button type="submit" name="submit">

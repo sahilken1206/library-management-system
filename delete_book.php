@@ -3,39 +3,64 @@
 
 include "db.php";
 
-if (isset($_POST["delete"])) {
+if (!isset($_GET["id"])) {
+    die("Book ID not found.");
+}
 
-    $id = $_POST["id"];
+$id = $_GET["id"];
 
-    $stmt = mysqli_prepare(
-        $conn,
-        "DELETE FROM books WHERE id = ?"
-    );
+/* Get book details */
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "i",
-        $id
-    );
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT * FROM books WHERE id = ?"
+);
 
-    if (mysqli_stmt_execute($stmt)) {
-        echo "Book deleted successfully!";
-    } else {
-        echo "Error: " . mysqli_stmt_error($stmt);
-    }
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
+
+mysqli_stmt_execute($stmt);
+
+$result = mysqli_stmt_get_result($stmt);
+
+$book = mysqli_fetch_assoc($result);
+
+mysqli_stmt_close($stmt);
+
+if (!$book) {
+    die("Book not found.");
+}
+
+
+/* Delete book */
+
+$stmt = mysqli_prepare(
+    $conn,
+    "DELETE FROM books WHERE id = ?"
+);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
+
+if (mysqli_stmt_execute($stmt)) {
+
+    mysqli_stmt_close($stmt);
+
+    header("Location: book.php");
+    exit();
+
+} else {
+
+    echo "Error: " . mysqli_stmt_error($stmt);
 
     mysqli_stmt_close($stmt);
 }
 
 ?>
-
-<form method="POST">
-
-    Book ID:
-    <input type="number" name="id">
-    <br><br>
-
-    <button type="submit" name="delete">Delete Book</button>
-
-</form>
 ```

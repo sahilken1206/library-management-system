@@ -23,30 +23,58 @@ if (isset($_POST["submit"])) {
 
     } else {
 
+        /* Check if email already exists */
+
         $stmt = mysqli_prepare(
             $conn,
-            "INSERT INTO members (name, email, phone)
-             VALUES (?, ?, ?)"
+            "SELECT id FROM members WHERE email = ?"
         );
 
         mysqli_stmt_bind_param(
             $stmt,
-            "sss",
-            $name,
-            $email,
-            $phone
+            "s",
+            $email
         );
 
-        if (mysqli_stmt_execute($stmt)) {
+        mysqli_stmt_execute($stmt);
 
-            echo "Member added successfully!";
+        $result = mysqli_stmt_get_result($stmt);
+
+        mysqli_stmt_close($stmt);
+
+        if (mysqli_num_rows($result) > 0) {
+
+            echo "A member with this email already exists.";
 
         } else {
 
-            echo "Error: " . mysqli_stmt_error($stmt);
-        }
+            /* Add new member */
 
-        mysqli_stmt_close($stmt);
+            $stmt = mysqli_prepare(
+                $conn,
+                "INSERT INTO members (name, email, phone)
+                 VALUES (?, ?, ?)"
+            );
+
+            mysqli_stmt_bind_param(
+                $stmt,
+                "sss",
+                $name,
+                $email,
+                $phone
+            );
+
+            if (mysqli_stmt_execute($stmt)) {
+
+                echo "Member added successfully!";
+
+            } else {
+
+                echo "Error: " . mysqli_stmt_error($stmt);
+            }
+
+            mysqli_stmt_close($stmt);
+        }
     }
 }
 

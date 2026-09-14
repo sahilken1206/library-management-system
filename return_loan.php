@@ -1,4 +1,3 @@
-```php
 <?php
 
 include "db.php";
@@ -13,7 +12,8 @@ $stmt = mysqli_prepare(
     $conn,
     "UPDATE loans
      SET return_date = CURDATE()
-     WHERE id = ?"
+     WHERE id = ?
+     AND return_date IS NULL"
 );
 
 mysqli_stmt_bind_param(
@@ -24,18 +24,25 @@ mysqli_stmt_bind_param(
 
 if (mysqli_stmt_execute($stmt)) {
 
-    mysqli_stmt_close($stmt);
+    if (mysqli_stmt_affected_rows($stmt) > 0) {
 
-    header("Location: loans.php");
-    exit();
+        mysqli_stmt_close($stmt);
+
+        header("Location: loans.php");
+        exit();
+
+    } else {
+
+        mysqli_stmt_close($stmt);
+
+        echo "Loan is already returned or does not exist.";
+    }
 
 } else {
 
     echo "Error: " . mysqli_stmt_error($stmt);
 
     mysqli_stmt_close($stmt);
-
 }
 
 ?>
-```

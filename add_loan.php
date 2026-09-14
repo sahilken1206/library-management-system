@@ -18,6 +18,10 @@ if (isset($_POST["submit"])) {
 
         echo "Please fill in all fields.";
 
+    } elseif ($due_date < $loan_date) {
+
+        echo "Due date cannot be before loan date.";
+
     } else {
 
         /* Check if book exists */
@@ -70,34 +74,62 @@ if (isset($_POST["submit"])) {
 
             } else {
 
-                /* Create loan */
+                /* Check if book is already loaned */
 
                 $stmt = mysqli_prepare(
                     $conn,
-                    "INSERT INTO loans
-                    (book_id, member_id, loan_date, due_date)
-                    VALUES (?, ?, ?, ?)"
+                    "SELECT id FROM loans
+                     WHERE book_id = ?
+                     AND return_date IS NULL"
                 );
 
                 mysqli_stmt_bind_param(
                     $stmt,
-                    "iiss",
-                    $book_id,
-                    $member_id,
-                    $loan_date,
-                    $due_date
+                    "i",
+                    $book_id
                 );
 
-                if (mysqli_stmt_execute($stmt)) {
+                mysqli_stmt_execute($stmt);
 
-                    echo "Loan created successfully!";
+                $active_loan_result = mysqli_stmt_get_result($stmt);
+
+                mysqli_stmt_close($stmt);
+
+                if (mysqli_num_rows($active_loan_result) > 0) {
+
+                    echo "This book is already loaned out.";
 
                 } else {
 
-                    echo "Error: " . mysqli_stmt_error($stmt);
-                }
+                    /* Create loan */
 
-                mysqli_stmt_close($stmt);
+                    $stmt = mysqli_prepare(
+                        $conn,
+                        "INSERT INTO loans
+                        (book_id, member_id, loan_date, due_date)
+                        VALUES (?, ?, ?, ?)"
+                    );
+
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        "iiss",
+                        $book_id,
+                        $member_id,
+                        $loan_date,
+                        $due_date
+                    );
+
+                    if (mysqli_stmt_execute($stmt)) {
+
+                        echo "Loan created successfully!";
+
+                    } else {
+
+                        echo "Error: " . mysqli_stmt_error($stmt);
+                    }
+
+                    mysqli_stmt_close($stmt);
+                }
             }
         }
     }

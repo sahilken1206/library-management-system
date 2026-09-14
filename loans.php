@@ -1,3 +1,4 @@
+```php
 <?php
 
 include "db.php";
@@ -23,10 +24,13 @@ $result = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
+
     <title>Library Loans</title>
+
 </head>
 
 <body>
@@ -36,13 +40,23 @@ $result = mysqli_stmt_get_result($stmt);
 <table border="1" cellpadding="10">
 
     <tr>
+
         <th>Loan ID</th>
+
         <th>Book</th>
+
         <th>Member</th>
+
         <th>Loan Date</th>
+
         <th>Due Date</th>
+
         <th>Return Date</th>
+
+        <th>Status</th>
+
         <th>Action</th>
+
     </tr>
 
 <?php
@@ -58,11 +72,11 @@ while ($loan = mysqli_fetch_assoc($result)) {
         </td>
 
         <td>
-            <?php echo $loan["title"]; ?>
+            <?php echo htmlspecialchars($loan["title"]); ?>
         </td>
 
         <td>
-            <?php echo $loan["name"]; ?>
+            <?php echo htmlspecialchars($loan["name"]); ?>
         </td>
 
         <td>
@@ -78,9 +92,59 @@ while ($loan = mysqli_fetch_assoc($result)) {
             <?php
 
             if ($loan["return_date"] == NULL) {
+
                 echo "Not returned";
+
             } else {
+
                 echo $loan["return_date"];
+
+            }
+
+            ?>
+
+        </td>
+
+        <td>
+
+            <?php
+
+            /* Check loan status */
+
+            if ($loan["return_date"] == NULL) {
+
+                if (date("Y-m-d") > $loan["due_date"]) {
+
+                    $today = new DateTime();
+                    $due_date = new DateTime($loan["due_date"]);
+
+                    $days_overdue = $due_date->diff($today)->days;
+
+                    echo "Overdue by " . $days_overdue . " days";
+
+                } else {
+
+                    echo "Active";
+
+                }
+
+            } else {
+
+                $return_date = new DateTime($loan["return_date"]);
+                $due_date = new DateTime($loan["due_date"]);
+
+                if ($return_date > $due_date) {
+
+                    $days_late = $due_date->diff($return_date)->days;
+
+                    echo "Returned late by " . $days_late . " days";
+
+                } else {
+
+                    echo "Returned on time";
+
+                }
+
             }
 
             ?>
@@ -96,7 +160,9 @@ while ($loan = mysqli_fetch_assoc($result)) {
             ?>
 
                 <a href="return_loan.php?id=<?php echo $loan["id"]; ?>">
+
                     Return
+
                 </a>
 
                 |
@@ -112,13 +178,17 @@ while ($loan = mysqli_fetch_assoc($result)) {
             ?>
 
             <a href="edit_loan.php?id=<?php echo $loan["id"]; ?>">
+
                 Edit
+
             </a>
 
             |
 
             <a href="delete_loan.php?id=<?php echo $loan["id"]; ?>">
+
                 Delete
+
             </a>
 
         </td>
@@ -138,3 +208,4 @@ mysqli_stmt_close($stmt);
 </body>
 
 </html>
+```

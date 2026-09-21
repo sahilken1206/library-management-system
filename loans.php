@@ -1,4 +1,4 @@
-```php
+
 <?php
 
 include "db.php";
@@ -208,4 +208,4 @@ mysqli_stmt_close($stmt);
 </body>
 
 </html>
-```
+

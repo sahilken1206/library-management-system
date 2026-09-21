@@ -1,4 +1,3 @@
-```php
 <?php
 
 include "db.php";
@@ -9,22 +8,43 @@ if (isset($_GET["search"])) {
     $search = $_GET["search"];
 }
 
-$sql = "SELECT * FROM books";
-
 if ($search != "") {
-    $search = mysqli_real_escape_string($conn, $search);
 
     $sql = "SELECT * FROM books
-            WHERE title LIKE '%$search%'
-            OR author LIKE '%$search%'";
-}
+            WHERE title LIKE ?
+            OR author LIKE ?";
 
-$result = mysqli_query($conn, $sql);
+    $stmt = mysqli_prepare($conn, $sql);
+
+    $search_term = "%" . $search . "%";
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "ss",
+        $search_term,
+        $search_term
+    );
+
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
+
+} else {
+
+    $sql = "SELECT * FROM books";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
+}
 
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
 
     <title>Book Catalogue</title>
@@ -108,9 +128,11 @@ $result = mysqli_query($conn, $sql);
         }
 
         @media (max-width: 700px) {
+
             .books {
                 grid-template-columns: 1fr;
             }
+
         }
 
     </style>
@@ -185,4 +207,3 @@ $result = mysqli_query($conn, $sql);
 
 </body>
 </html>
-```

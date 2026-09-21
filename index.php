@@ -1,4 +1,4 @@
-```php
+
 <?php
 
 include "db.php";
@@ -123,4 +123,4 @@ $loans = mysqli_fetch_assoc($loans_result);
 </body>
 
 </html>
-```
+

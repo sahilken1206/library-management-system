@@ -1,4 +1,4 @@
-```php
+
 <?php
 
 include "db.php";
@@ -36,4 +36,4 @@ if (mysqli_stmt_execute($stmt)) {
 }
 
 ?>
-```
+

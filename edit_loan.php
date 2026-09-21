@@ -85,7 +85,7 @@ if (isset($_POST["submit"])) {
     <input
         type="date"
         name="loan_date"
-        value="<?php echo $loan["loan_date"]; ?>"
+        value="<?php echo htmlspecialchars($loan["loan_date"]); ?>"
     >
 
     <br><br>
@@ -94,7 +94,7 @@ if (isset($_POST["submit"])) {
     <input
         type="date"
         name="due_date"
-        value="<?php echo $loan["due_date"]; ?>"
+        value="<?php echo htmlspecialchars($loan["due_date"]); ?>"
     >
 
     <br><br>

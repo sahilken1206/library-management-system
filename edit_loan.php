@@ -1,19 +1,26 @@
 <?php
 
+include "auth.php";
 include "db.php";
 
 if (!isset($_GET["id"])) {
-    die("Loan ID missing.");
+    die("Loan ID not found.");
 }
 
 $id = $_GET["id"];
 
+/* Get loan details */
+
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT loan_date, due_date FROM loans WHERE id = ?"
+    "SELECT * FROM loans WHERE id = ?"
 );
 
-mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_bind_param(
+    $stmt,
+    "i",
+    $id
+);
 
 mysqli_stmt_execute($stmt);
 
@@ -27,40 +34,47 @@ if (!$loan) {
     die("Loan not found.");
 }
 
-if (isset($_POST["submit"])) {
 
+/* Update loan */
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $book_id = $_POST["book_id"];
+    $member_id = $_POST["member_id"];
     $loan_date = $_POST["loan_date"];
     $due_date = $_POST["due_date"];
 
-    if (empty($loan_date) || empty($due_date)) {
+    if ($due_date < $loan_date) {
+        die("Due date cannot be before loan date.");
+    }
 
-        echo "Please fill in all fields.";
+    $stmt = mysqli_prepare(
+        $conn,
+        "UPDATE loans
+         SET book_id = ?, member_id = ?, loan_date = ?, due_date = ?
+         WHERE id = ?"
+    );
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "iissi",
+        $book_id,
+        $member_id,
+        $loan_date,
+        $due_date,
+        $id
+    );
+
+    if (mysqli_stmt_execute($stmt)) {
+
+        mysqli_stmt_close($stmt);
+
+        header("Location: loans.php");
+        exit();
 
     } else {
 
-        $stmt = mysqli_prepare(
-            $conn,
-            "UPDATE loans 
-             SET loan_date = ?, due_date = ?
-             WHERE id = ?"
-        );
-
-        mysqli_stmt_bind_param(
-            $stmt,
-            "ssi",
-            $loan_date,
-            $due_date,
-            $id
-        );
-
-        if (mysqli_stmt_execute($stmt)) {
-
-            echo "Loan updated successfully!";
-
-        } else {
-
-            echo "Error: " . mysqli_stmt_error($stmt);
-        }
+        echo "Error: " . mysqli_stmt_error($stmt);
 
         mysqli_stmt_close($stmt);
     }
@@ -70,41 +84,65 @@ if (isset($_POST["submit"])) {
 
 <!DOCTYPE html>
 <html>
-
 <head>
+
     <title>Edit Loan</title>
+
 </head>
 
 <body>
 
-<h2>Edit Loan</h2>
+<h1>Edit Loan</h1>
 
 <form method="POST">
 
-    Loan Date:
+    <label>Book ID:</label><br>
+    <input
+        type="number"
+        name="book_id"
+        value="<?php echo htmlspecialchars($loan["book_id"]); ?>"
+        required
+    >
+
+    <br><br>
+
+    <label>Member ID:</label><br>
+    <input
+        type="number"
+        name="member_id"
+        value="<?php echo htmlspecialchars($loan["member_id"]); ?>"
+        required
+    >
+
+    <br><br>
+
+    <label>Loan Date:</label><br>
     <input
         type="date"
         name="loan_date"
         value="<?php echo htmlspecialchars($loan["loan_date"]); ?>"
+        required
     >
 
     <br><br>
 
-    Due Date:
+    <label>Due Date:</label><br>
     <input
         type="date"
         name="due_date"
         value="<?php echo htmlspecialchars($loan["due_date"]); ?>"
+        required
     >
 
     <br><br>
 
-    <button type="submit" name="submit">
-        Update Loan
-    </button>
+    <button type="submit">Update Loan</button>
 
 </form>
 
-</body>
+<br>
 
+<a href="loans.php">Back to Loans</a>
+
+</body>
 </html>

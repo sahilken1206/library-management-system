@@ -1,6 +1,6 @@
-
 <?php
 
+include "auth.php";
 include "db.php";
 
 $result = mysqli_query($conn, "SELECT * FROM members");
@@ -138,12 +138,12 @@ $result = mysqli_query($conn, "SELECT * FROM members");
                 <td>
 
                     <a class="edit"
-                       href="update_member.php?id=<?php echo $member["id"]; ?>">
+                       href="update_member.php?id=<?php echo htmlspecialchars($member["id"]); ?>">
                         Edit
                     </a>
 
                     <a class="delete"
-                       href="delete_member.php?id=<?php echo $member["id"]; ?>"
+                       href="delete_member.php?id=<?php echo htmlspecialchars($member["id"]); ?>"
                        onclick="return confirm('Are you sure you want to delete this member?');">
                         Delete
                     </a>
@@ -165,4 +165,3 @@ $result = mysqli_query($conn, "SELECT * FROM members");
 </body>
 
 </html>
-

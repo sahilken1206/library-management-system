@@ -1,6 +1,6 @@
-
 <?php
 
+include "auth.php";
 include "db.php";
 
 if (!isset($_GET["id"])) {
@@ -144,4 +144,3 @@ if (isset($_POST["submit"])) {
 </body>
 
 </html>
-

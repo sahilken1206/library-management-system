@@ -1,6 +1,6 @@
-
 <?php
 
+include "auth.php";
 include "db.php";
 
 if (!isset($_GET["id"])) {
@@ -36,4 +36,3 @@ if (mysqli_stmt_execute($stmt)) {
 }
 
 ?>
-

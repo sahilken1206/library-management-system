@@ -1,15 +1,29 @@
-
 <?php
 
+include "auth.php";
 include "db.php";
 
-$books_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM books");
+$books_result = mysqli_query(
+    $conn,
+    "SELECT COUNT(*) AS total FROM books"
+);
+
 $books = mysqli_fetch_assoc($books_result);
 
-$members_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM members");
+
+$members_result = mysqli_query(
+    $conn,
+    "SELECT COUNT(*) AS total FROM members"
+);
+
 $members = mysqli_fetch_assoc($members_result);
 
-$loans_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM loans");
+
+$loans_result = mysqli_query(
+    $conn,
+    "SELECT COUNT(*) AS total FROM loans"
+);
+
 $loans = mysqli_fetch_assoc($loans_result);
 
 ?>
@@ -27,100 +41,107 @@ $loans = mysqli_fetch_assoc($loans_result);
 
 <body>
 
-    <div class="sidebar">
+<div class="sidebar">
 
-        <h2>📚 Library</h2>
+    <h2>Library System</h2>
 
-        <a href="index.php">🏠 Dashboard</a>
+    <a href="index.php">Dashboard</a>
 
-        <a href="book.php">📚 Books</a>
+    <a href="book.php">Books</a>
 
-        <a href="members.php">👥 Members</a>
+    <a href="members.php">Members</a>
 
-        <a href="loans.php">📖 Loans</a>
+    <a href="loans.php">Loans</a>
 
-    </div>
+    <a href="add_book.php">Add Book</a>
+
+    <a href="add_member.php">Add Member</a>
+
+    <a href="add_loan.php">Loan a Book</a>
+
+    <a href="logout.php">Logout</a>
+
+</div>
 
 
-    <div class="main">
+<div class="main">
 
-        <h1>Library Management System</h1>
+    <h1>Library Management System</h1>
 
-        <p class="subtitle">
-            Manage books, members and loans from one place.
-        </p>
+    <p class="subtitle">
+        Manage books, members and loans
+    </p>
 
 
-        <div class="cards">
+    <div class="cards">
 
-            <div class="card">
+        <div class="card">
 
-                <h3>📚 Books</h3>
+            <h3>Total Books</h3>
 
-                <div class="number">
-                    <?php echo $books["total"]; ?>
-                </div>
-
-                <a class="button" href="book.php">
-                    View Books
-                </a>
-
+            <div class="number">
+                <?php echo $books["total"]; ?>
             </div>
 
-
-            <div class="card">
-
-                <h3>👥 Members</h3>
-
-                <div class="number">
-                    <?php echo $members["total"]; ?>
-                </div>
-
-                <a class="button" href="members.php">
-                    View Members
-                </a>
-
-            </div>
-
-
-            <div class="card">
-
-                <h3>📖 Loans</h3>
-
-                <div class="number">
-                    <?php echo $loans["total"]; ?>
-                </div>
-
-                <a class="button" href="loans.php">
-                    View Loans
-                </a>
-
-            </div>
+            <a class="button" href="book.php">
+                View Books
+            </a>
 
         </div>
 
 
-        <div class="quick-actions">
+        <div class="card">
 
-            <h2>Quick Actions</h2>
+            <h3>Total Members</h3>
 
-            <a class="button" href="add_book.php">
-                ➕ Add Book
+            <div class="number">
+                <?php echo $members["total"]; ?>
+            </div>
+
+            <a class="button" href="members.php">
+                View Members
             </a>
 
-            <a class="button" href="add_member.php">
-                ➕ Add Member
-            </a>
+        </div>
 
-            <a class="button" href="add_loan.php">
-                📖 Issue Loan
+
+        <div class="card">
+
+            <h3>Total Loans</h3>
+
+            <div class="number">
+                <?php echo $loans["total"]; ?>
+            </div>
+
+            <a class="button" href="loans.php">
+                View Loans
             </a>
 
         </div>
 
     </div>
+
+
+    <div class="quick-actions">
+
+        <h2>Quick Actions</h2>
+
+        <a class="button" href="add_book.php">
+            Add Book
+        </a>
+
+        <a class="button" href="add_member.php">
+            Add Member
+        </a>
+
+        <a class="button" href="add_loan.php">
+            Loan a Book
+        </a>
+
+    </div>
+
+</div>
 
 </body>
 
 </html>
-

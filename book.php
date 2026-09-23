@@ -1,11 +1,14 @@
 <?php
 
+include "auth.php";
 include "db.php";
 
 $search = "";
 
 if (isset($_GET["search"])) {
+
     $search = $_GET["search"];
+
 }
 
 if ($search != "") {
@@ -143,7 +146,7 @@ if ($search != "") {
 
 <div class="container">
 
-    <h1>📚 Book Catalogue</h1>
+    <h1> Book Catalogue</h1>
 
     <div class="search-box">
 
@@ -156,9 +159,13 @@ if ($search != "") {
                 value="<?php echo htmlspecialchars($search); ?>"
             >
 
-            <button type="submit">Search</button>
+            <button type="submit">
+                Search
+            </button>
 
-            <a class="clear" href="book.php">Clear Search</a>
+            <a class="clear" href="book.php">
+                Clear Search
+            </a>
 
         </form>
 
@@ -206,4 +213,5 @@ if ($search != "") {
 </div>
 
 </body>
+
 </html>

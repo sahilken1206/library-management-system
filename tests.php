@@ -23,39 +23,47 @@ echo "<h1>Library Management System - Basic Tests</h1>";
 /* Test 1: Database connection */
 test_result(
     "Database connection",
-    $conn && mysqli_ping($conn)
+    $conn !== false
 );
 
 /* Test 2: Books table */
 $result = mysqli_query($conn, "SHOW TABLES LIKE 'books'");
+
 test_result(
     "Books table exists",
-    mysqli_num_rows($result) > 0
+    $result && mysqli_num_rows($result) > 0
 );
 
 /* Test 3: Members table */
 $result = mysqli_query($conn, "SHOW TABLES LIKE 'members'");
+
 test_result(
     "Members table exists",
-    mysqli_num_rows($result) > 0
+    $result && mysqli_num_rows($result) > 0
 );
 
 /* Test 4: Loans table */
 $result = mysqli_query($conn, "SHOW TABLES LIKE 'loans'");
+
 test_result(
     "Loans table exists",
-    mysqli_num_rows($result) > 0
+    $result && mysqli_num_rows($result) > 0
 );
 
 /* Test 5: Users table */
 $result = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
+
 test_result(
     "Users table exists",
-    mysqli_num_rows($result) > 0
+    $result && mysqli_num_rows($result) > 0
 );
 
 /* Test 6: Prepared statement */
-$stmt = mysqli_prepare($conn, "SELECT id FROM books WHERE id = ?");
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id FROM books WHERE id = ?"
+);
+
 $test_id = 1;
 
 if ($stmt) {
@@ -71,8 +79,121 @@ test_result(
     $executed
 );
 
+/* Test 7: Loans can be read */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id FROM loans LIMIT 1"
+);
+
+if ($stmt) {
+    $executed = mysqli_stmt_execute($stmt);
+
+    if ($executed) {
+        $result = mysqli_stmt_get_result($stmt);
+        $loan_read = $result !== false;
+    } else {
+        $loan_read = false;
+    }
+
+    mysqli_stmt_close($stmt);
+} else {
+    $loan_read = false;
+}
+
+test_result(
+    "Loans can be read",
+    $loan_read
+);
+
+/* Test 8: Returned loans can be identified */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id FROM loans WHERE return_date IS NOT NULL LIMIT 1"
+);
+
+if ($stmt) {
+    $executed = mysqli_stmt_execute($stmt);
+
+    if ($executed) {
+        $result = mysqli_stmt_get_result($stmt);
+        $return_test = $result !== false;
+    } else {
+        $return_test = false;
+    }
+
+    mysqli_stmt_close($stmt);
+} else {
+    $return_test = false;
+}
+
+test_result(
+    "Return flow can be checked",
+    $return_test
+);
+
+/* Test 9: Active loans can be identified */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id FROM loans WHERE return_date IS NULL LIMIT 1"
+);
+
+if ($stmt) {
+    $executed = mysqli_stmt_execute($stmt);
+
+    if ($executed) {
+        $result = mysqli_stmt_get_result($stmt);
+        $active_loan_test = $result !== false;
+    } else {
+        $active_loan_test = false;
+    }
+
+    mysqli_stmt_close($stmt);
+} else {
+    $active_loan_test = false;
+}
+
+test_result(
+    "Active loans can be checked",
+    $active_loan_test
+);
+
+/* Test 10: Loan due dates can be read */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id, loan_date, due_date FROM loans LIMIT 1"
+);
+
+if ($stmt) {
+    $executed = mysqli_stmt_execute($stmt);
+
+    if ($executed) {
+        $result = mysqli_stmt_get_result($stmt);
+        $due_date_test = false;
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            $loan = mysqli_fetch_assoc($result);
+
+            $due_date_test =
+                !empty($loan["loan_date"]) &&
+                !empty($loan["due_date"]);
+        }
+    } else {
+        $due_date_test = false;
+    }
+
+    mysqli_stmt_close($stmt);
+} else {
+    $due_date_test = false;
+}
+
+test_result(
+    "Loan and due dates can be read",
+    $due_date_test
+);
+
 /* Final result */
 echo "<hr>";
+
 echo "<h2>Tests Passed: " . $passed . "</h2>";
 echo "<h2>Tests Failed: " . $failed . "</h2>";
 

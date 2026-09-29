@@ -9,13 +9,11 @@ if (!isset($_GET["id"])) {
 
 $id = $_GET["id"];
 
-/* Check if member has an active loan */
+/* Check if member has any loan history */
 
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT id FROM loans
-     WHERE member_id = ?
-     AND return_date IS NULL"
+    "SELECT id FROM loans WHERE member_id = ?"
 );
 
 mysqli_stmt_bind_param(
@@ -32,10 +30,9 @@ mysqli_stmt_close($stmt);
 
 if (mysqli_num_rows($result) > 0) {
 
-    die("Cannot delete this member because they currently have a book on loan.");
+    die("Cannot delete this member because loan history exists for this member.");
 
 }
-
 
 /* Delete member */
 

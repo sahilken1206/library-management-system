@@ -1,7 +1,7 @@
 
 -- Library & Book Management System
 -- Database schema
--- Import this file into an empty MySQL database.
+-- Import into an empty MySQL database.
 
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -43,5 +43,15 @@ CREATE TABLE IF NOT EXISTS `loans` (
     `return_date` DATE DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `book_id` (`book_id`),
-    KEY `member_id` (`member_id`)
+    KEY `member_id` (`member_id`),
+    CONSTRAINT `loans_ibfk_1`
+        FOREIGN KEY (`book_id`)
+        REFERENCES `books` (`id`)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+    CONSTRAINT `loans_ibfk_2`
+        FOREIGN KEY (`member_id`)
+        REFERENCES `members` (`id`)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
